@@ -3,6 +3,7 @@
   "description": "Laravel AI Document Intelligence & OCR package for Laravel 12 AI SDK. Convert PDF to JSON, extract tables, image to text, Ask PDF with AI, audio transcription and multi-language support using GPT-4, Claude and Gemini.",
   "type": "library",
   "license": "MIT",
+  "version": "1.0.0",
   "keywords": [
     "laravel",
     "ai",
