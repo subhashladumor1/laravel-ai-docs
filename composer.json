@@ -1,0 +1,70 @@
+{
+  "name": "subhashladumor1/laravel-ai-docs",
+  "description": "Laravel AI Document Intelligence & OCR package for Laravel 12 AI SDK. Convert PDF to JSON, extract tables, image to text, Ask PDF with AI, audio transcription and multi-language support using GPT-4, Claude and Gemini.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "laravel",
+    "ai",
+    "ocr",
+    "pdf",
+    "document",
+    "gpt-4",
+    "claude",
+    "gemini",
+    "image-to-text",
+    "audio-transcription",
+    "table-extraction",
+    "laravel-ai-sdk"
+  ],
+  "authors": [
+    {
+      "name": "Subhash Ladumor"
+    }
+  ],
+  "require": {
+    "php": "^8.2|^8.3",
+    "smalot/pdfparser": "^2.0",
+    "phpoffice/phpword": "^1.4",
+    "intervention/image-laravel": "^1.5",
+    "guzzlehttp/guzzle": "^7.0"
+  },
+  "require-dev": {
+    "pestphp/pest": "^4.0",
+    "pestphp/pest-plugin-laravel": "^4.0",
+    "mockery/mockery": "^1.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Subhashladumor1\\LaravelAiDocs\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Subhashladumor1\\LaravelAiDocs\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Subhashladumor1\\LaravelAiDocs\\LaravelAIDocsServiceProvider"
+      ],
+      "aliases": {
+        "AIDocs": "Subhashladumor1\\LaravelAiDocs\\Facades\\AIDocs"
+      }
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "scripts": {
+    "test": "./vendor/bin/pest",
+    "test-coverage": "./vendor/bin/pest --coverage"
+  }
+}
