@@ -51,9 +51,11 @@ class PDFBuilder
         private readonly AskPDFService $askService,
         private readonly MarkdownService $markdownService,
         private readonly JSONConversionService $jsonService,
+        ?string $language = null,
     ) {
         $this->startTime = microtime(true);
-        $this->rawText = $this->pdfService->extractText($this->provider, $this->filePath);
+        $this->language = $language;
+        $this->rawText = $this->pdfService->extractText($this->provider, $this->filePath, $this->language);
     }
 
     /**

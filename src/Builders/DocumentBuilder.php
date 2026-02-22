@@ -54,8 +54,10 @@ class DocumentBuilder
         private readonly AskPDFService $askService,
         private readonly MarkdownService $markdownService,
         private readonly JSONConversionService $jsonService,
+        ?string $language = null,
     ) {
         $this->startTime = microtime(true);
+        $this->language = $language;
         $this->rawText = $this->extractRawText();
     }
 
@@ -175,7 +177,7 @@ class DocumentBuilder
         $ext = $this->fileValidator->extension($this->filePath);
 
         return match ($ext) {
-            'pdf' => $this->pdfService->extractText($this->provider, $this->filePath),
+            'pdf' => $this->pdfService->extractText($this->provider, $this->filePath, $this->language),
             'docx', 'doc' => $this->docxService->extractText($this->filePath),
             'txt', 'md' => file_get_contents($this->filePath) ?: '',
             default => file_get_contents($this->filePath) ?: '',

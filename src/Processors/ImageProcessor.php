@@ -74,7 +74,7 @@ class ImageProcessor
      */
     private function processWithIntervention(string $filePath): array
     {
-        /** @var \Intervention\Image\Laravel\Facades\Image $image */
+        /** @var \Intervention\Image\Interfaces\ImageInterface $image */
         $image = \Intervention\Image\Laravel\Facades\Image::read($filePath);
 
         $maxW = (int) ($this->config['max_width'] ?? 2048);
@@ -87,8 +87,9 @@ class ImageProcessor
         }
 
         // Auto-rotate
+        // Note: Intervention Image v3 applies EXIF rotation automatically on read.
         if ($this->config['auto_rotate'] ?? true) {
-            $image->autoOrient();
+            // No action needed for v3
         }
 
         $quality = (int) ($this->config['quality'] ?? 90);

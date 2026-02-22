@@ -22,14 +22,19 @@ class ClaudeProvider implements AIProviderInterface
      */
     public function __construct(private readonly array $config)
     {
-        $this->currentModel = $config['default_model'] ?? 'claude-3-5-sonnet-20241022';
-        $this->visionModel = $config['vision_model'] ?? 'claude-3-5-sonnet-20241022';
+        $this->currentModel = $config['default_model'] ?? 'claude-sonnet-4-6';
+        $this->visionModel = $config['vision_model'] ?? 'claude-sonnet-4-6';
+
+        $apiKey = $config['api_key'] ?? '';
+        if (empty($apiKey)) {
+            throw new \Subhashladumor1\LaravelAiDocs\Exceptions\FileProcessingException('Claude API key is not configured. Please set ANTHROPIC_API_KEY in your .env file.');
+        }
 
         $this->http = new Client([
             'base_uri' => rtrim($config['base_uri'] ?? 'https://api.anthropic.com', '/') . '/',
             'timeout' => $config['timeout'] ?? 120,
             'headers' => [
-                'x-api-key' => $config['api_key'] ?? '',
+                'x-api-key' => $apiKey,
                 'anthropic-version' => $config['api_version'] ?? '2023-06-01',
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
