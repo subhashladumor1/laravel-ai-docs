@@ -43,8 +43,10 @@ class ImageBuilder
         private readonly AskPDFService $askService,
         private readonly MarkdownService $markdownService,
         private readonly JSONConversionService $jsonService,
+        ?string $language = null,
     ) {
         $this->startTime = microtime(true);
+        $this->language = $language;
     }
 
     /**

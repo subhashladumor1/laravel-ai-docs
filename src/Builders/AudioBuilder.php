@@ -32,8 +32,10 @@ class AudioBuilder
         private readonly LanguageDetector $languageDetector,
         private readonly AudioService $audioService,
         private readonly SummarizerService $summarizerService,
+        ?string $language = null,
     ) {
         $this->startTime = microtime(true);
+        $this->language = $language;
     }
 
     /**

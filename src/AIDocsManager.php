@@ -148,6 +148,7 @@ class AIDocsManager
             askService: $this->askService,
             markdownService: $this->markdownService,
             jsonService: $this->jsonService,
+            language: $this->language,
         );
     }
 
@@ -172,6 +173,7 @@ class AIDocsManager
             askService: $this->askService,
             markdownService: $this->markdownService,
             jsonService: $this->jsonService,
+            language: $this->language,
         );
     }
 
@@ -191,6 +193,7 @@ class AIDocsManager
             languageDetector: $this->languageDetector,
             audioService: $this->audioService,
             summarizerService: $this->summarizerService,
+            language: $this->language,
         );
     }
 
@@ -216,6 +219,7 @@ class AIDocsManager
             askService: $this->askService,
             markdownService: $this->markdownService,
             jsonService: $this->jsonService,
+            language: $this->language,
         );
     }
 

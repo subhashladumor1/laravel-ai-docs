@@ -105,6 +105,15 @@ AI_DOCS_PROVIDER=openai
 
 ---
 
+## 🧪 Open Source Laravel AI Docs Lab
+
+Want to test this package before integrating it? We've built an open-source testing UI where you can upload documents, test all AI models, and experiment with the API visually!
+
+[![Laravel AI Docs Lab](https://raw.githubusercontent.com/subhashladumor1/laravel-ai-docs-lab/main/screenshots/image.png)](https://github.com/subhashladumor1/laravel-ai-docs-lab)
+
+👉 **[Get the Laravel AI Docs Lab on GitHub](https://github.com/subhashladumor1/laravel-ai-docs-lab)**
+
+
 ## Real-World Example 1 — Invoice Processing System
 
 Your e-commerce platform receives thousands of supplier invoices as PDFs every day. You need to extract line items, totals, vendor names and due dates automatically.
@@ -412,13 +421,13 @@ $result = AIDocs::provider('gemini')->pdf($file)->toJson();
 
 | Alias | Provider | Best For |
 |---|---|---|
-| `gpt-4.1` | OpenAI | General documents, high accuracy |
-| `gpt-4o` | OpenAI | Scanned images, vision tasks |
-| `claude-3-5-sonnet` | Anthropic | Long documents, legal, code |
-| `claude-3-5-haiku` | Anthropic | Fast, cost-efficient summarization |
-| `claude-3-opus` | Anthropic | Maximum reasoning depth |
-| `gemini-1.5-pro` | Google | Multilingual, large context |
-| `gemini-1.5-flash` | Google | High speed, low cost |
+| `gpt-5.2` / `gpt-5` | OpenAI | Latest generation general documents, max accuracy |
+| `gpt-5-mini` / `gpt-4o` | OpenAI | Scanned images, vision tasks, fast processing |
+| `claude-sonnet-4-6` | Anthropic | Latest iteration for long documents, legal, code |
+| `claude-opus-4-6` | Anthropic | Maximum reasoning depth |
+| `claude-haiku-4-5` | Anthropic | Fast, cost-efficient summarization |
+| `gemini-3.1-pro-preview` | Google | Multilingual, ultra-large context |
+| `gemini-3-flash-preview` | Google | High speed, low cost |
 
 ---
 

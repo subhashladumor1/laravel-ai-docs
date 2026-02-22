@@ -24,15 +24,20 @@ class OpenAIProvider implements AIProviderInterface
      */
     public function __construct(private readonly array $config)
     {
-        $this->currentModel = $config['default_model'] ?? 'gpt-4.1';
-        $this->visionModel = $config['vision_model'] ?? 'gpt-4o';
+        $this->currentModel = $config['default_model'] ?? 'gpt-5.2';
+        $this->visionModel = $config['vision_model'] ?? 'gpt-5.2';
         $this->whisperModel = $config['whisper_model'] ?? 'whisper-1';
 
+        $apiKey = $config['api_key'] ?? '';
+        if (empty($apiKey)) {
+            throw new \Subhashladumor1\LaravelAiDocs\Exceptions\FileProcessingException('OpenAI API key is not configured. Please set OPENAI_API_KEY in your .env file.');
+        }
+
         $this->http = new Client([
-            'base_uri' => $config['base_uri'] ?? 'https://api.openai.com/v1/',
+            'base_uri' => rtrim($config['base_uri'] ?? 'https://api.openai.com/v1/', '/') . '/',
             'timeout' => $config['timeout'] ?? 120,
             'headers' => [
-                'Authorization' => 'Bearer ' . ($config['api_key'] ?? ''),
+                'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ],

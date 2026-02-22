@@ -24,9 +24,13 @@ class GeminiProvider implements AIProviderInterface
      */
     public function __construct(private readonly array $config)
     {
-        $this->currentModel = $config['default_model'] ?? 'gemini-1.5-pro';
-        $this->visionModel = $config['vision_model'] ?? 'gemini-1.5-pro';
+        $this->currentModel = $config['default_model'] ?? 'gemini-3.1-pro-preview';
+        $this->visionModel = $config['vision_model'] ?? 'gemini-3.1-pro-preview';
+
         $this->apiKey = $config['api_key'] ?? '';
+        if (empty($this->apiKey)) {
+            throw new \Subhashladumor1\LaravelAiDocs\Exceptions\FileProcessingException('Gemini API key is not configured. Please set GEMINI_API_KEY in your .env file.');
+        }
 
         $this->http = new Client([
             'base_uri' => rtrim($config['base_uri'] ?? 'https://generativelanguage.googleapis.com/v1beta', '/') . '/',
