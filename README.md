@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-103%20passed-brightgreen.svg?style=flat-square)](#testing)
 
-> **Turn any PDF, image, audio or Word document into structured, searchable intelligence — powered by GPT-4, Claude 3.5, or Gemini 1.5 — with a single line of Laravel code.**
+> **Turn any PDF, image, audio or Word document into structured, searchable intelligence — powered by GPT-5.2, Claude 4.6, or Gemini 3.1 — with a single line of Laravel code.**
 
 ---
 
@@ -66,9 +66,9 @@ flowchart TD
     L --> M
 
     M --> N{Active Provider}
-    N -->|openai| O[OpenAI GPT-4.1 / GPT-4o / Whisper]
-    N -->|claude| P[Anthropic Claude 3.5 Sonnet]
-    N -->|gemini| Q[Google Gemini 1.5 Pro]
+    N -->|openai| O[OpenAI GPT-5.2 / GPT-5-mini / Whisper]
+    N -->|claude| P[Anthropic Claude 4.6 Sonnet]
+    N -->|gemini| Q[Google Gemini 3.1 Pro Preview]
 
     O --> R[DocumentResultDTO]
     P --> R
@@ -126,7 +126,7 @@ class InvoiceProcessor
     public function process(string $pdfPath): array
     {
         // Extract ALL structured data from the invoice in one call
-        $data = AIDocs::model('gpt-4.1')->pdf($pdfPath)->toJson();
+        $data = AIDocs::model('gpt-5.2')->pdf($pdfPath)->toJson();
 
         // $data contains:
         // [
@@ -166,7 +166,7 @@ flowchart LR
     C -->|Yes| D[JSONConversionService: Build AI prompt]
     C -->|No - scanned| E[ImageProcessor: Convert to base64]
     E --> D
-    D --> F[OpenAI GPT-4.1: generateStructured]
+    D --> F[OpenAI GPT-5.2: generateStructured]
     F --> G[Parse JSON response]
     G --> H[title + key_values + entities + summary]
     H --> I[(Invoice Database)]
@@ -186,7 +186,7 @@ class ContractChatbot
         // The package automatically chunks the contract into overlapping
         // windows, scores each chunk for relevance, then sends only the
         // relevant context to the AI (RAG pipeline).
-        return AIDocs::model('claude-3-5-sonnet')
+        return AIDocs::model('claude-sonnet-4-6')
             ->pdf($contractPath)
             ->ask($question);
     }
@@ -215,7 +215,7 @@ flowchart TD
     D --> E[Relevance Scorer: keyword frequency per chunk vs question]
     E --> F[Top 5 most relevant chunks]
     F --> G[Prompt Builder: Context + Question]
-    G --> H[Claude 3.5 Sonnet]
+    G --> H[Claude 4.6 Sonnet]
     H --> I[Precise answer grounded in document]
 ```
 
@@ -256,7 +256,7 @@ flowchart LR
     B --> C[Resize max 2048px + Auto-rotate + Normalize quality]
     C --> D[Encode to base64]
     D --> E[OCRService: Build vision prompt]
-    E --> F[GPT-4o Vision API - high detail mode]
+    E --> F[GPT-5-mini Vision API - high detail mode]
     F --> G[Extracted text preserving layout]
     G --> H[Your Database]
 ```
@@ -367,7 +367,7 @@ class FinancialReportParser
     public function parse(string $reportPath): array
     {
         // Full pipeline: extract text → find tables → summarize → markdown
-        $result = AIDocs::model('gpt-4.1')
+        $result = AIDocs::model('gpt-5.2')
             ->pdf($reportPath)
             ->enhance()       // pre-process PDF
             ->tables()        // extract all data tables
@@ -390,7 +390,7 @@ class FinancialReportParser
             'summary'    => $result->summary,
             'tables'     => count($result->tables),
             'provider'   => $result->provider,  // 'openai'
-            'model'      => $result->model,     // 'gpt-4.1'
+            'model'      => $result->model,     // 'gpt-5.2'
             'time'       => round($result->processingTimeSeconds, 2) . 's',
         ];
     }
@@ -405,15 +405,15 @@ You can switch providers per-request. No config changes needed — just chain `.
 
 ```php
 // Use the cheapest model for simple summaries
-$quickSummary = AIDocs::model('gemini-1.5-flash')->pdf($file)->summarize()->text();
+$quickSummary = AIDocs::model('gemini-3-flash-preview')->pdf($file)->summarize()->text();
 
 // Use the most capable model for complex legal analysis
-$legalAnalysis = AIDocs::model('claude-3-5-sonnet')->pdf($contract)->ask(
+$legalAnalysis = AIDocs::model('claude-sonnet-4-6')->pdf($contract)->ask(
     'Identify all clauses that could create liability for the vendor.'
 );
 
-// Use GPT-4o for vision-heavy scanned documents
-$scannedText = AIDocs::model('gpt-4o')->image($scan)->text();
+// Use GPT-5-mini for vision-heavy scanned documents
+$scannedText = AIDocs::model('gpt-5-mini')->image($scan)->text();
 
 // Chain with explicit provider name
 $result = AIDocs::provider('gemini')->pdf($file)->toJson();
@@ -422,12 +422,15 @@ $result = AIDocs::provider('gemini')->pdf($file)->toJson();
 | Alias | Provider | Best For |
 |---|---|---|
 | `gpt-5.2` / `gpt-5` | OpenAI | Latest generation general documents, max accuracy |
-| `gpt-5-mini` / `gpt-4o` | OpenAI | Scanned images, vision tasks, fast processing |
+| `gpt-5.2-pro` | OpenAI | Advanced reasoning tasks |
+| `gpt-5-mini` / `gpt-5-nano` | OpenAI | Scanned images, vision tasks, fast processing |
 | `claude-sonnet-4-6` | Anthropic | Latest iteration for long documents, legal, code |
 | `claude-opus-4-6` | Anthropic | Maximum reasoning depth |
 | `claude-haiku-4-5` | Anthropic | Fast, cost-efficient summarization |
 | `gemini-3.1-pro-preview` | Google | Multilingual, ultra-large context |
+| `gemini-3-pro-preview` | Google | Advanced reasoning and logic |
 | `gemini-3-flash-preview` | Google | High speed, low cost |
+| `gemini-2.5-pro` | Google | Previous generation pro model |
 
 ---
 
@@ -462,7 +465,7 @@ flowchart TD
 Every `->result()` call returns a typed `DocumentResultDTO`. It's immutable and holds everything your pipeline produced:
 
 ```php
-$dto = AIDocs::model('gpt-4.1')
+$dto = AIDocs::model('gpt-5.2')
     ->pdf('/path/to/report.pdf')
     ->enhance()
     ->tables()
@@ -483,7 +486,7 @@ $dto->markdown;              // Markdown-formatted document
 $dto->json;                  // Structured JSON array
 $dto->language;              // Detected language: 'en', 'ar', etc.
 $dto->provider;              // 'openai' | 'claude' | 'gemini'
-$dto->model;                 // 'gpt-4.1' | 'claude-3-5-sonnet' | etc.
+$dto->model;                 // 'gpt-5.2' | 'claude-sonnet-4-6' | etc.
 $dto->processingTimeSeconds; // Wall-clock time used
 
 // Convert for API responses
@@ -528,15 +531,15 @@ These three methods configure the active provider and language **before** you ca
 
 | Method | Returns | Description |
 |---|---|---|
-| `AIDocs::model(string $alias)` | `AIDocsManager` | Switch provider + model via alias, e.g. `'gpt-4o'`, `'claude-3-5-sonnet'` |
+| `AIDocs::model(string $alias)` | `AIDocsManager` | Switch provider + model via alias, e.g. `'gpt-5-mini'`, `'claude-sonnet-4-6'` |
 | `AIDocs::provider(string $name)` | `AIDocsManager` | Switch provider by name: `'openai'`, `'claude'`, `'gemini'` |
 | `AIDocs::language(string $code)` | `AIDocsManager` | Force a language code, e.g. `'ar'`, `'fr'`, `'zh'` |
 
 ```php
 // Switch model (auto-detects provider from alias)
-AIDocs::model('gpt-4o')->pdf($file)->text();
-AIDocs::model('claude-3-5-sonnet')->pdf($file)->summarize()->text();
-AIDocs::model('gemini-1.5-flash')->pdf($file)->toJson();
+AIDocs::model('gpt-5-mini')->pdf($file)->text();
+AIDocs::model('claude-sonnet-4-6')->pdf($file)->summarize()->text();
+AIDocs::model('gemini-3-flash-preview')->pdf($file)->toJson();
 
 // Switch provider explicitly (uses that provider's default model)
 AIDocs::provider('claude')->pdf($file)->ask('Who signed this?');
@@ -544,10 +547,10 @@ AIDocs::provider('gemini')->image($scan)->text();
 
 // Force language for all operations in the chain
 AIDocs::language('ar')->pdf($file)->summarize()->text();
-AIDocs::language('fr')->model('claude-3-5-sonnet')->document($docx)->toMarkdown();
+AIDocs::language('fr')->model('claude-sonnet-4-6')->document($docx)->toMarkdown();
 
 // Multiple overrides — order doesn't matter
-AIDocs::model('gpt-4o')->language('zh')->image($scan)->text();
+AIDocs::model('gpt-5-mini')->language('zh')->image($scan)->text();
 AIDocs::language('de')->provider('gemini')->pdf($file)->toJson();
 ```
 
@@ -587,6 +590,7 @@ Returned by `AIDocs::pdf($path)`. Text is **automatically extracted** on constru
 | `pages` | `pages(): int` | `int` | Return the total page count |
 | `ask` | `ask(string $question): string` | `string` | RAG Q&A: answer a question using the document as context |
 | `toJson` | `toJson(?string $prompt = null): array` | `array` | Extract structured JSON from the document |
+| `structured` | `structured(): array` | `array` | Generate a structured extraction (alias for toJson with a structured focus) |
 | `toMarkdown` | `toMarkdown(): string` | `string` | Build a Markdown document from whatever was accumulated |
 | `result` | `result(): DocumentResultDTO` | `DocumentResultDTO` | Collect everything into a typed result object |
 
@@ -614,7 +618,10 @@ $data = AIDocs::pdf($file)->toJson();
 // 7. JSON with custom schema instruction
 $invoice = AIDocs::pdf($file)->toJson('Extract: vendor, total, due_date, line_items as JSON.');
 
-// 8. Extract tables only
+// 8. Structured Extraction
+$data = AIDocs::pdf($file)->structured();
+
+// 9. Extract tables only
 $result = AIDocs::pdf($file)->tables()->result();
 $tables = $result->tables; // TableDTO[]
 
@@ -634,12 +641,12 @@ $result = AIDocs::pdf($file)->enhance()->tables()->summarize()->result();
 $summary = AIDocs::language('ar')->pdf($file)->summarize()->text();
 
 // 14. Multi-provider same file
-$fast    = AIDocs::model('gemini-1.5-flash')->pdf($file)->summarize()->text();
-$precise = AIDocs::model('claude-3-5-sonnet')->pdf($file)->ask('What are the risks?');
+$fast    = AIDocs::model('gemini-3-flash-preview')->pdf($file)->summarize()->text();
+$precise = AIDocs::model('claude-sonnet-4-6')->pdf($file)->ask('What are the risks?');
 
 // 15. Page count before processing
 if (AIDocs::pdf($file)->pages() > 100) {
-    $summary = AIDocs::model('claude-3-5-sonnet')->pdf($file)->summarize()->text();
+    $summary = AIDocs::model('claude-sonnet-4-6')->pdf($file)->summarize()->text();
 } else {
     $summary = AIDocs::pdf($file)->toJson();
 }
@@ -706,11 +713,11 @@ $result = AIDocs::image($scan)->result();
 echo $result->rawText;
 echo $result->language; // auto-detected
 
-// 10. Use GPT-4o for best OCR accuracy
-$text = AIDocs::model('gpt-4o')->image($scan)->text();
+// 10. Use GPT-5-mini for best OCR accuracy
+$text = AIDocs::model('gpt-5-mini')->image($scan)->text();
 
 // 11. Medical form: focused extraction prompt + JSON
-$fields = AIDocs::model('gpt-4o')
+$fields = AIDocs::model('gpt-5-mini')
     ->language('en')
     ->image($medicalForm)
     ->toJson();
@@ -835,7 +842,7 @@ $md = AIDocs::document($txtFile)->toMarkdown();
 $summary = AIDocs::language('de')->document($germanDocx)->summarize()->text();
 
 // 10. Ask a question using Claude (long context = better for big docs)
-$answer = AIDocs::model('claude-3-5-sonnet')->document($docx)->ask(
+$answer = AIDocs::model('claude-sonnet-4-6')->document($docx)->ask(
     'Summarize all obligations of Party B.'
 );
 ```
@@ -859,7 +866,7 @@ Every `->result()` call returns a `DocumentResultDTO`. It is **immutable** — v
 | `$mimeType` | `?string` | Detected from the file |
 | `$filePath` | `?string` | The source file path |
 | `$provider` | `?string` | `'openai'`, `'claude'`, `'gemini'` |
-| `$model` | `?string` | e.g. `'gpt-4.1'`, `'claude-3-5-sonnet-20241022'` |
+| `$model` | `?string` | e.g. `'gpt-5.2'`, `'claude-sonnet-4-6'` |
 | `$processingTimeSeconds` | `float` | Wall-clock time the pipeline took |
 | `$transcript` | `?string` | Audio only — same as `$rawText` for audio |
 
@@ -942,17 +949,17 @@ return [
     'providers' => [
         'openai' => [
             'api_key'       => env('OPENAI_API_KEY'),
-            'default_model' => env('OPENAI_DEFAULT_MODEL', 'gpt-4.1'),
-            'vision_model'  => env('OPENAI_VISION_MODEL',  'gpt-4o'),
+            'default_model' => env('OPENAI_DEFAULT_MODEL', 'gpt-5.2'),
+            'vision_model'  => env('OPENAI_VISION_MODEL',  'gpt-5-mini'),
             'whisper_model' => env('OPENAI_WHISPER_MODEL', 'whisper-1'),
         ],
         'claude' => [
             'api_key'       => env('ANTHROPIC_API_KEY'),
-            'default_model' => env('CLAUDE_DEFAULT_MODEL', 'claude-3-5-sonnet-20241022'),
+            'default_model' => env('CLAUDE_DEFAULT_MODEL', 'claude-sonnet-4-6'),
         ],
         'gemini' => [
             'api_key'       => env('GEMINI_API_KEY'),
-            'default_model' => env('GEMINI_DEFAULT_MODEL', 'gemini-1.5-pro'),
+            'default_model' => env('GEMINI_DEFAULT_MODEL', 'gemini-3.1-pro-preview'),
         ],
     ],
 
@@ -1060,9 +1067,9 @@ src/
 │
 ├── Providers/                      ← One class per AI vendor
 │   ├── Contracts/AIProviderInterface.php
-│   ├── OpenAIProvider.php          ← GPT-4.1, GPT-4o, Whisper
-│   ├── ClaudeProvider.php          ← Claude 3.5 Sonnet / Haiku / Opus
-│   └── GeminiProvider.php          ← Gemini 1.5 Pro / Flash
+│   ├── OpenAIProvider.php          ← GPT-5.2, GPT-5-mini, Whisper
+│   ├── ClaudeProvider.php          ← Claude 4.6 Sonnet / Haiku / Opus
+│   └── GeminiProvider.php          ← Gemini 3.1 Pro Preview / Flash
 │
 ├── Processors/                     ← Pre-processing before AI calls
 │   ├── ImageProcessor.php          ← Resize, rotate, base64 encode
@@ -1079,7 +1086,7 @@ src/
 │   └── ProviderNotSupportedException.php
 │
 ├── Support/
-│   ├── ModelResolver.php           ← 'claude-3-5-sonnet' → {provider, model}
+│   ├── ModelResolver.php           ← 'claude-sonnet-4-6' → {provider, model}
 │   ├── LanguageDetector.php        ← Unicode script analysis
 │   └── FileValidator.php           ← Type + size + existence checks
 │
